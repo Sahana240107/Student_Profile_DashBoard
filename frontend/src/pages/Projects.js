@@ -7,110 +7,125 @@ export default function Projects({ reg }) {
 
   useEffect(() => {
     setLoading(true);
-    getProjects(reg).then(r => setData(r.data)).catch(() => setData(null)).finally(() => setLoading(false));
+    getProjects(reg)
+      .then(r => setData(r.data))
+      .catch(() => setData(null))
+      .finally(() => setLoading(false));
   }, [reg]);
 
-  if (loading) return <div className="loading">⏳ Loading projects & placements…</div>;
-  if (!data)   return <div className="empty"><div className="empty-icon">💼</div><p>No data found.</p></div>;
+  if (loading) return <div className="loading">Loading projects & placements…</div>;
+  if (!data)   return <div className="empty"><div className="empty-icon">—</div><p>No data found.</p></div>;
 
   const { projects, placements } = data;
-  const internships  = placements.filter(p => p.type === 'Internship');
-  const placed       = placements.filter(p => p.type === 'Placement');
+  const internships = placements.filter(p => p.type === 'Internship');
+  const placed      = placements.filter(p => p.type === 'Placement');
 
   return (
-    <>
-      {/* Projects */}
-      <div className="card" style={{ marginBottom: 16 }}>
-        <div className="card-head">🔬 Project Details</div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+      {/* ── Project Details ── */}
+      <div className="parent-card">
+        <div className="parent-card-head">
+          <div className="parent-card-head-title">Project Details</div>
+        </div>
         {projects.length === 0 ? (
-          <div className="empty" style={{ padding: 24 }}>
-            <div className="empty-icon" style={{ fontSize: 28 }}>🔬</div>
+          <div className="empty" style={{ padding: 32 }}>
             <p>No project details available.</p>
           </div>
         ) : (
-          <div className="card-body">
-            {projects.map(pr => (
-              <div key={pr.project_id} style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
-                <div className="info-grid">
-                  <div className="info-item">
+          projects.map((pr, idx) => (
+            <div key={pr.project_id} style={{ borderBottom: idx < projects.length - 1 ? '1px solid var(--border)' : 'none' }}>
+              <div style={{ padding: '0 24px' }}>
+                <div className="info-vertical">
+                  <div className="info-row">
                     <span className="info-label">Project Title</span>
-                    <span className="info-value" style={{ fontWeight: 700, fontSize: 15 }}>{pr.project_title}</span>
+                    <span className="info-value" style={{ fontWeight: 700 }}>{pr.project_title}</span>
                   </div>
-                  <div className="info-item">
+                  <div className="info-row">
                     <span className="info-label">Guide Name</span>
                     <span className="info-value">{pr.guide_name || '—'}</span>
                   </div>
                   {pr.semester && (
-                    <div className="info-item">
+                    <div className="info-row">
                       <span className="info-label">Semester</span>
                       <span className="info-value">Semester {pr.semester}</span>
                     </div>
                   )}
                   {pr.year && (
-                    <div className="info-item">
+                    <div className="info-row">
                       <span className="info-label">Year</span>
                       <span className="info-value">Year {pr.year}</span>
                     </div>
                   )}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))
         )}
       </div>
 
-      {/* Placements & Internships side by side */}
-      <div className="two-col">
-        <div className="card">
-          <div className="card-head">🏢 Placements</div>
-          {placed.length === 0 ? (
-            <div className="empty" style={{ padding: 24 }}>
-              <div className="empty-icon" style={{ fontSize: 24 }}>🏢</div>
-              <p>Not yet placed.</p>
-            </div>
-          ) : (
-            <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {placed.map(p => (
-                <div key={p.placement_id} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div className="info-item">
+      {/* ── Internship ── */}
+      <div className="parent-card">
+        <div className="parent-card-head">
+          <div className="parent-card-head-title">Internship</div>
+        </div>
+        {internships.length === 0 ? (
+          <div className="empty" style={{ padding: 32 }}>
+            <p>No internship records found.</p>
+          </div>
+        ) : (
+          internships.map((p, idx) => (
+            <div key={p.placement_id} style={{ borderBottom: idx < internships.length - 1 ? '1px solid var(--border)' : 'none' }}>
+              <div style={{ padding: '0 24px' }}>
+                <div className="info-vertical">
+                  <div className="info-row">
                     <span className="info-label">Company</span>
-                    <span className="info-value" style={{ fontWeight: 700 }}>
-                      <span className="badge badge-green">✅ {p.company_name}</span>
-                    </span>
+                    <span className="info-value" style={{ fontWeight: 700 }}>{p.company_name}</span>
                   </div>
                   {p.package_lpa && (
-                    <div className="info-item">
-                      <span className="info-label">Package</span>
-                      <span className="info-value" style={{ fontWeight: 700, color: 'var(--success)' }}>
-                        ₹{p.package_lpa} LPA
-                      </span>
+                    <div className="info-row">
+                      <span className="info-label">Stipend / Package</span>
+                      <span className="info-value" style={{ color: 'var(--success)', fontWeight: 700 }}>₹{p.package_lpa} LPA</span>
                     </div>
                   )}
                 </div>
-              ))}
+              </div>
             </div>
-          )}
-        </div>
-
-        <div className="card">
-          <div className="card-head">💻 Internships</div>
-          {internships.length === 0 ? (
-            <div className="empty" style={{ padding: 24 }}>
-              <div className="empty-icon" style={{ fontSize: 24 }}>💻</div>
-              <p>No internship records.</p>
-            </div>
-          ) : (
-            <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {internships.map(p => (
-                <div key={p.placement_id} className="ach-item">
-                  {p.company_name}
-                  {p.package_lpa && <span style={{ marginLeft: 10, color: 'var(--success)', fontWeight: 700 }}>₹{p.package_lpa} LPA</span>}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+          ))
+        )}
       </div>
-    </>
+
+      {/* ── Placement ── */}
+      <div className="parent-card">
+        <div className="parent-card-head">
+          <div className="parent-card-head-title">Placement</div>
+        </div>
+        {placed.length === 0 ? (
+          <div className="empty" style={{ padding: 32 }}>
+            <p>Not yet placed.</p>
+          </div>
+        ) : (
+          placed.map((p, idx) => (
+            <div key={p.placement_id} style={{ borderBottom: idx < placed.length - 1 ? '1px solid var(--border)' : 'none' }}>
+              <div style={{ padding: '0 24px' }}>
+                <div className="info-vertical">
+                  <div className="info-row">
+                    <span className="info-label">Company</span>
+                    <span className="info-value" style={{ fontWeight: 700 }}>{p.company_name}</span>
+                  </div>
+                  {p.package_lpa && (
+                    <div className="info-row">
+                      <span className="info-label">Package</span>
+                      <span className="info-value" style={{ color: 'var(--success)', fontWeight: 700 }}>₹{p.package_lpa} LPA</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+    </div>
   );
 }
